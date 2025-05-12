@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SidSriram's playlist</title>
+  <link rel="stylesheet" href="music.css" />
+  <script src="https://kit.fontawesome.com/43be427ca7.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="music-player">
+      <nav>
+        <div class="circle">
+          <i class="fa-solid fa-angle-left"></i>
+        </div>
+        <div class="circle" onclick="toggleSongList()">
+          <i class="fa-solid fa-bars"></i>
+        </div>
+      </nav>
+
+      <img src="" class="song-img" id="song-img" />
+      <h1 id="song-title">Urike Urike</h1>
+      <p id="song-artist">Sid Sriram</p>
+
+      <audio id="song">
+        <source id="audio-source" src="Urike.mp3" type="audio/mpeg" />
+      </audio>
+
+      <input type="range" value="0" id="progress-bar" />
+      
+      <div class="controls">
+        <div onclick="playPrevious()">
+          <i class="fa-solid fa-backward"></i>
+        </div>
+        <div onclick="playPause()">
+          <i class="fa-solid fa-play" id="ctrlIcon"></i>
+        </div>
+        <div onclick="playNext()">
+          <i class="fa-solid fa-forward"></i>
+        </div>
+      </div>
+
+      <!-- Hidden Song List Menu -->
+      <ul id="song-list" style="display: none; margin-top: 20px;"></ul>
+    </div>
+  </div>
+
+  <script>
+    const songs = [
+      {
+        title: "Urike Urike",
+        artist: "Sid Sriram",
+        src: "Urike.mp3",
+        img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT93iccQlzxm0dXygLg5Y4omFIedmvWPrRM6g&s"
+      },
+      {
+        title: "Samajavaragamana",
+        artist: "Sid Sriram",
+        src: "music2.mp3",
+        img: "https://upload.wikimedia.org/wikipedia/en/9/90/Samajavaragamana.jpg"
+      },
+      {
+        title: "Srivalli",
+        artist: "Sid Sriram",
+        src: "music3.mp3",
+        img: "https://a10.gaanacdn.com/gn_img/song/w4MKPgOboj/MKPJBjn4Wo/size_m_1639157515.webp"
+      },
+      {
+        title: "Oke Oka lokam",
+        artist: "Sid Sriram",
+        src: "music4.mp3",
+        img: "https://www.naasongs.to/wp-content/uploads/2021/01/Sashi-2021-Okey-Oka-Lokam.jpg"
+      },
+      {
+        title: "Srivalli",
+        artist: "Sid Sriram",
+        src: "music3.mp3",
+        img: "https://a10.gaanacdn.com/gn_img/song/w4MKPgOboj/MKPJBjn4Wo/size_m_1639157515.webp"
+      }
+    ];
+
+    let currentSong = 0;
+    const song = document.getElementById('song');
+    const progress = document.getElementById('progress-bar');
+    const ctrlIcon = document.getElementById('ctrlIcon');
+    const title = document.getElementById('song-title');
+    const artist = document.getElementById('song-artist');
+    const img = document.getElementById('song-img');
+    const audioSource = document.getElementById('audio-source');
+    const songList = document.getElementById('song-list');
+
+    function loadSong(index) {
+      const s = songs[index];
+      title.textContent = s.title;
+      artist.textContent = s.artist;
+      img.src = s.img;
+      audioSource.src = s.src;
+      song.load();
+      song.play();
+      ctrlIcon.classList.remove('fa-play');
+      ctrlIcon.classList.add('fa-pause');
+    }
+
+    function playPause() {
+      if (song.paused) {
+        song.play();
+        ctrlIcon.classList.remove('fa-play');
+        ctrlIcon.classList.add('fa-pause');
+      } else {
+        song.pause();
+        ctrlIcon.classList.remove('fa-pause');
+        ctrlIcon.classList.add('fa-play');
+      }
+    }
+
+    function playNext() {
+      currentSong = (currentSong + 1) % songs.length;
+      loadSong(currentSong);
+    }
+
+    function playPrevious() {
+      currentSong = (currentSong - 1 + songs.length) % songs.length;
+      loadSong(currentSong);
+    }
+
+    song.onloadedmetadata = function () {
+      progress.max = song.duration;
+      progress.value = song.currentTime;
+    };
+
+    setInterval(() => {
+      progress.value = song.currentTime;
+    }, 500);
+
+    progress.onchange = function () {
+      song.currentTime = progress.value;
+      song.play();
+      ctrlIcon.classList.add('fa-pause');
+      ctrlIcon.classList.remove('fa-play');
+    };
+
+    function toggleSongList() {
+      if (songList.style.display === 'none') {
+        showSongList();
+      } else {
+        songList.style.display = 'none';
+      }
+    }
+
+    function showSongList() {
+      songList.innerHTML = '';
+      songs.forEach((s, index) => {
+        const li = document.createElement('li');
+        li.textContent = `${index + 1}. ${s.title}`;
+        li.style.cursor = 'pointer';
+        li.onclick = () => {
+          currentSong = index;
+          loadSong(index);
+          songList.style.display = 'none';
+        };
+        songList.appendChild(li);
+      });
+      songList.style.display = 'block';
+    }
+
+    // Load the first song initially
+    loadSong(currentSong);
+  </script>
+</body>
+</html>
